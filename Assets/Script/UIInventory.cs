@@ -23,6 +23,8 @@ public class UIInventory : MonoBehaviour
     public GameObject unEquipButton;
     public GameObject dropButton;
 
+    [SerializeField] private Buff playerBuff;
+
     private int curEquipIndex;
 
     private PlayerController controller;
@@ -162,10 +164,7 @@ public class UIInventory : MonoBehaviour
 
     public void SelectItem(int index)
     {
-        if (slots[index].item == null) {
-
-            Debug.Log("난 아이템 속을 들여다 보았지만.. 그곳엔 오직 공허뿐이었어"); return;
-        }
+        if (slots[index].item == null)return;
         selectedItem = slots[index];
         selectedItemIndex = index;
 
@@ -179,6 +178,11 @@ public class UIInventory : MonoBehaviour
         {
             selectedItemStatName.text += selectedItem.item.consumables[i].type.ToString() + "\n";
             selectedItemStatValue.text += selectedItem.item.consumables[i].value.ToString() + "\n";
+            if(selectedItem.item.consumables[i].type == ConsumableType.SpeedBuff|| selectedItem.item.consumables[i].type == ConsumableType.JumpBuff)
+            {
+                selectedItemStatName.text += "Duration\n";
+                selectedItemStatValue.text += selectedItem.item.consumables[i].duration.ToString() + "\n";
+            }
         }
 
         useButton.SetActive(selectedItem.item.type == ItemType.Consumable);
@@ -199,6 +203,10 @@ public class UIInventory : MonoBehaviour
                         condition.Heal(selectedItem.item.consumables[i].value); break;
                     case ConsumableType.Hunger:
                         condition.Eat(selectedItem.item.consumables[i].value); break;
+                    case ConsumableType.SpeedBuff:
+                        playerBuff.ApplySpeedBuff(selectedItem.item.consumables[i].value, selectedItem.item.consumables[i].duration); break;
+                    case ConsumableType.JumpBuff:
+                        playerBuff.ApplyJumpBuff(selectedItem.item.consumables[i].value, selectedItem.item.consumables[i].duration); break;
                 }
             }
             RemoveSelctedItem();

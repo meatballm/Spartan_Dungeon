@@ -27,15 +27,31 @@ public class Interaction : MonoBehaviour
         {
             lastCheckTime = Time.time;
 
-            Ray ray = camera.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2));
-            RaycastHit hit;
+            Ray ray = camera.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0));
+            RaycastHit[] hits = Physics.RaycastAll(ray, maxCheckDistance+ PlayerController.Instance.camDistance, layerMask);
+            float closestDist = float.MaxValue;
+            GameObject bestObj = null;
+            IInteractable bestInteract = null;
 
-            if (Physics.Raycast(ray, out hit, maxCheckDistance + PlayerController.Instance.camDistance, layerMask))
+            foreach (var h in hits)
             {
-                if (hit.collider.gameObject != curInteractGameObject)
+                if (h.distance <= PlayerController.Instance.camDistance)
+                    continue;
+                if (h.collider.gameObject == this.gameObject)
+                    continue;
+                if (h.distance < closestDist)
                 {
-                    curInteractGameObject = hit.collider.gameObject;
-                    curInteractable = hit.collider.GetComponent<IInteractable>();
+                    closestDist = h.distance;
+                    bestObj = h.collider.gameObject;
+                    bestInteract = h.collider.GetComponent<IInteractable>();
+                }
+            }
+            if (bestObj != null)
+            {
+                if (bestObj != curInteractGameObject)
+                {
+                    curInteractGameObject = bestObj;
+                    curInteractable = bestInteract;
                     SetPromptText();
                 }
             }

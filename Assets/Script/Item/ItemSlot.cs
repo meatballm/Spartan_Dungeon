@@ -47,7 +47,6 @@ public class ItemSlot : MonoBehaviour
 
     public void OnClickButton()
     {
-        Debug.Log("인생 리셋 버튼 포칫");
         inventory.SelectItem(index);
     }
 }

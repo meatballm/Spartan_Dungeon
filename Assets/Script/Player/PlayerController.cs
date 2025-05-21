@@ -16,9 +16,12 @@ public class PlayerController : MonoBehaviour
     public float maxXLook;
     private float camCurXRot;
     public float lookSensitivity;
-    public float camDistance;
     public float cameraHeight;
 
+    [Header("ThirdPerson")]
+    public float camDistance;
+    private Camera MainCamera;
+    private Camera EquipCamera;
     private Vector2 mouseDelta;
 
     [HideInInspector]
@@ -26,20 +29,42 @@ public class PlayerController : MonoBehaviour
     public Action inventory;
     private Rigidbody rigidbody;
 
-    public static PlayerController Instance = null;
+    public static PlayerController instance = null;
 
     private void Awake()
     {
         rigidbody = GetComponent<Rigidbody>();
-        if (Instance == null)
+        if (instance == null)
         {
-            Instance = this;
+            instance = this;
         }
     }
-
+    public static PlayerController Instance
+    {
+        get
+        {
+            if (null == instance)
+            {
+                return null;
+            }
+            return instance;
+        }
+    }
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
+
+        Transform camTf = cameraContainer.Find("MainCamera");
+        if (camTf != null)
+            MainCamera = camTf.GetComponent<Camera>();
+        if (MainCamera == null)
+            Debug.LogError("MainCamera를 camContainer 하위에서 찾지 못했습니다!");
+
+        camTf = cameraContainer.Find("EquipCamera");
+        if (camTf != null)
+            EquipCamera = camTf.GetComponent<Camera>();
+        if (EquipCamera == null)
+            Debug.LogError("EquipCamera를 camContainer 하위에서 찾지 못했습니다!");
     }
 
     private void FixedUpdate()
@@ -93,8 +118,10 @@ public class PlayerController : MonoBehaviour
     {
         camCurXRot += mouseDelta.y * lookSensitivity;
         camCurXRot = Mathf.Clamp(camCurXRot, minXLook, maxXLook);
-        cameraContainer.localEulerAngles = new Vector3(-camCurXRot, 0, 0);
-        cameraContainer.localPosition = new Vector3(0,camDistance*Mathf.Sin(-camCurXRot * Mathf.Deg2Rad) +cameraHeight, -camDistance * Mathf.Cos(-camCurXRot * Mathf.Deg2Rad));
+        MainCamera.transform.localEulerAngles = new Vector3(-camCurXRot, 0, 0);
+        MainCamera.transform.localPosition = new Vector3(0, camDistance * Mathf.Sin(-camCurXRot * Mathf.Deg2Rad) + cameraHeight, -camDistance * Mathf.Cos(-camCurXRot * Mathf.Deg2Rad));
+        EquipCamera.transform.localEulerAngles = new Vector3(-camCurXRot, 0, 0);
+        EquipCamera.transform.localPosition = new Vector3(0, cameraHeight, 0);
 
         transform.eulerAngles += new Vector3(0, mouseDelta.x * lookSensitivity, 0);
     }
