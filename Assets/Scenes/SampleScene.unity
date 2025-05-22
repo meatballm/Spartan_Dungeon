@@ -4906,6 +4906,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2cb39f58e0e0ca4aa461645eba33e02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  buffIconPrefab: {fileID: 6849428244838246255, guid: 05163759cd123e9489e2069d358d7779, type: 3}
+  buffContainer: {fileID: 271040253}
 --- !u!1 &1313334257
 GameObject:
   m_ObjectHideFlags: 0

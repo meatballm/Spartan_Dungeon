@@ -204,9 +204,9 @@ public class UIInventory : MonoBehaviour
                     case ConsumableType.Hunger:
                         condition.Eat(selectedItem.item.consumables[i].value); break;
                     case ConsumableType.SpeedBuff:
-                        playerBuff.ApplySpeedBuff(selectedItem.item.consumables[i].value, selectedItem.item.consumables[i].duration); break;
+                        playerBuff.ApplySpeedBuff(selectedItem.item, selectedItem.item.consumables[i].value, selectedItem.item.consumables[i].duration); break;
                     case ConsumableType.JumpBuff:
-                        playerBuff.ApplyJumpBuff(selectedItem.item.consumables[i].value, selectedItem.item.consumables[i].duration); break;
+                        playerBuff.ApplyJumpBuff(selectedItem.item, selectedItem.item.consumables[i].value, selectedItem.item.consumables[i].duration); break;
                 }
             }
             RemoveSelctedItem();

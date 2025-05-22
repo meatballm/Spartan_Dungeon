@@ -43,9 +43,13 @@ public class EquipTool : Equip
     public void OnHit()
     {
         Ray ray = camera.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0));
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit, attackDistance))
+        RaycastHit[] hits = Physics.RaycastAll(ray, attackDistance + PlayerController.Instance.camDistance);
+        foreach (RaycastHit hit in hits)
         {
+            if (hit.distance <= PlayerController.Instance.camDistance)
+                continue;
+            if (hit.collider.gameObject == this.gameObject)
+                continue;
             if (doesGatherResources && hit.collider.TryGetComponent(out Resource resource))
             {
                 resource.Gather(hit.point, hit.normal);
