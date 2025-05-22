@@ -9,6 +9,8 @@ public class PlayerController : MonoBehaviour
     private Vector2 curMovementInput;
     public float jumpPower;
     public LayerMask groundLayerMask;
+    public float sprintSpeed;
+    private bool isSprint=false;
 
     [Header("Look")]
     public Transform cameraContainer;
@@ -89,7 +91,7 @@ public class PlayerController : MonoBehaviour
     {
         if (context.phase == InputActionPhase.Performed)
         {
-            curMovementInput = context.ReadValue<Vector2>();
+           curMovementInput = context.ReadValue<Vector2>();
         }
         else if (context.phase == InputActionPhase.Canceled)
         {
@@ -105,10 +107,20 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void OnSprintStarted(InputAction.CallbackContext context)
+    {
+        if(context.started)
+            isSprint = true;
+        else if(context.canceled)
+            isSprint = false;
+    }
+
     private void Move()
     {
         Vector3 dir = transform.forward * curMovementInput.y + transform.right * curMovementInput.x;
-        dir *= moveSpeed;
+        dir *= (curMovementInput != Vector2.zero && isSprint)
+            ? sprintSpeed*moveSpeed
+            : moveSpeed;
         dir.y = rigidbody.velocity.y;
 
         rigidbody.velocity = dir;
