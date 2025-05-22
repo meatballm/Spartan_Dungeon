@@ -25,7 +25,7 @@ public class UIInventory : MonoBehaviour
 
     [SerializeField] private Buff playerBuff;
 
-    private int curEquipIndex;
+    private int[] curEquipIndex = new int[3] {-1,-1,-1};
 
     private PlayerController controller;
     private PlayerCondition condition;
@@ -117,7 +117,6 @@ public class UIInventory : MonoBehaviour
         ThrowItem(data);
         CharacterManager.Instance.Player.itemData = null;
     }
-
     public void UpdateUI()
     {
         for (int i = 0; i < slots.Length; i++)
@@ -132,7 +131,6 @@ public class UIInventory : MonoBehaviour
             }
         }
     }
-
     ItemSlot GetItemStack(ItemData data)
     {
         for (int i = 0; i < slots.Length; i++)
@@ -239,14 +237,37 @@ public class UIInventory : MonoBehaviour
 
     public void OnEquipButton()
     {
-        if (slots[curEquipIndex].equipped)
+        bool equipped;
+        try
         {
-            UnEquip(curEquipIndex);
+            equipped = slots[curEquipIndex[selectedItem.item.equipTypeIndex]].equipped;
+        }
+        catch
+        {
+            equipped = false;
+        }
+        if (equipped)
+        {
+            UnEquip(curEquipIndex[selectedItem.item.equipTypeIndex]);
+            Debug.Log(curEquipIndex[selectedItem.item.equipTypeIndex] + "번 해제 후->" + selectedItemIndex+"번 장착");
         }
 
         slots[selectedItemIndex].equipped = true;
-        curEquipIndex = selectedItemIndex;
-        CharacterManager.Instance.Player.equip.EquipNew(selectedItem.item);
+        curEquipIndex[selectedItem.item.equipTypeIndex] = selectedItemIndex;
+        if (selectedItem.item.equipType == 0)
+        {
+            CharacterManager.Instance.Player.equip.EquipNew(selectedItem.item);
+        }
+
+        for (int i = 0; i < selectedItem.item.equipBuffs.Length; i++)
+        {
+            switch (selectedItem.item.equipBuffs[i].type)
+            {
+                case EquipBuff.DoubleJump:
+                    CharacterManager.Instance.Player.controller.doubleJump = true; break;
+            }
+        }
+
         UpdateUI();
 
         SelectItem(selectedItemIndex);
@@ -255,12 +276,22 @@ public class UIInventory : MonoBehaviour
     void UnEquip(int index)
     {
         slots[index].equipped = false;
-        CharacterManager.Instance.Player.equip.UnEquip();
+        if(slots[index].item.equipType == 0)
+            CharacterManager.Instance.Player.equip.UnEquip();
         UpdateUI();
 
         if (selectedItemIndex == index)
         {
             SelectItem(selectedItemIndex);
+        }
+
+        for (int i = 0; i < selectedItem.item.equipBuffs.Length; i++)
+        {
+            switch (selectedItem.item.equipBuffs[i].type)
+            {
+                case EquipBuff.DoubleJump:
+                    CharacterManager.Instance.Player.controller.doubleJump = false; break;
+            }
         }
     }
 

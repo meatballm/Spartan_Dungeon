@@ -12,6 +12,8 @@ public class PlayerController : MonoBehaviour
     public float sprintSpeed = 1.5f;       // 달릴 때 속도 배수
     public float sprintStamina = 10f;   // 초당 소비량
     private bool isSprint=false;
+    public bool doubleJump = false;
+    private bool canDoubleJump = true;
 
     [Header("Look")]
     public Transform cameraContainer;
@@ -110,9 +112,15 @@ public class PlayerController : MonoBehaviour
 
     public void OnJumpInput(InputAction.CallbackContext context)
     {
-        if (context.phase == InputActionPhase.Started && IsGrounded())
+        if (context.phase == InputActionPhase.Started)
         {
+            if(IsGrounded())
             rigidbody.AddForce(Vector2.up * jumpPower, ForceMode.Impulse);
+            else if (canDoubleJump)
+            {
+                rigidbody.AddForce(Vector2.up * jumpPower, ForceMode.Impulse);
+                canDoubleJump = false;
+            }
         }
     }
 
@@ -126,13 +134,19 @@ public class PlayerController : MonoBehaviour
 
     private void Move()
     {
-        Vector3 dir = transform.forward * curMovementInput.y + transform.right * curMovementInput.x;
-        dir *= (curMovementInput != Vector2.zero && isSprint)
-            ? sprintSpeed*moveSpeed
-            : moveSpeed;
-        dir.y = rigidbody.velocity.y;
+        Vector3 inputDir = new Vector3(curMovementInput.x, 0f, curMovementInput.y);
+        if (inputDir.sqrMagnitude > 1f) inputDir.Normalize();
+        Vector3 worldDir = transform.TransformDirection(inputDir);
 
-        rigidbody.velocity = dir;
+        float speed = (curMovementInput != Vector2.zero && isSprint)
+                    ? sprintSpeed* moveSpeed
+                    : moveSpeed;
+        Vector3 targetVel = worldDir * speed;
+
+        Vector3 currentVel = rigidbody.velocity;
+        Vector3 deltaVel = targetVel - new Vector3(currentVel.x, 0f, currentVel.z);
+
+        rigidbody.AddForce(deltaVel, ForceMode.VelocityChange);
     }
 
     void CameraLook()
@@ -161,6 +175,7 @@ public class PlayerController : MonoBehaviour
         {
             if (Physics.Raycast(rays[i], 0.1f, groundLayerMask))
             {
+                DoubleJumpCharge();
                 return true;
             }
         }
@@ -181,5 +196,10 @@ public class PlayerController : MonoBehaviour
         bool toggle = Cursor.lockState == CursorLockMode.Locked;
         Cursor.lockState = toggle ? CursorLockMode.None : CursorLockMode.Locked;
         canLook = !toggle;
+    }
+
+    public void DoubleJumpCharge()
+    {
+        canDoubleJump = true;
     }
 }

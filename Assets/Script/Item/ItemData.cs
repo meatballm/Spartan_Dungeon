@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public enum ItemType
@@ -15,12 +16,29 @@ public enum ConsumableType
     JumpBuff
 }
 
+public enum EquipType
+{
+    Weapon,
+    Magica
+}
+public enum EquipBuff
+{
+    None,
+    DoubleJump
+}
+
 [System.Serializable]
 public class ItemDataConsumable
 {
     public ConsumableType type;
     public float value;
     public float duration;
+}
+[System.Serializable]
+public class ItemEquipBuff
+{
+    public EquipBuff type;
+    public float value;
 }
 
 [CreateAssetMenu(fileName = "Item", menuName = "New Item")]
@@ -32,6 +50,8 @@ public class ItemData : ScriptableObject
     public ItemType type;
     public Sprite icon;
     public GameObject dropPrefab;
+    public EquipType equipType;
+    [HideInInspector] public int equipTypeIndex;
 
     [Header("Stacking")]
     public bool canStack;
@@ -42,4 +62,13 @@ public class ItemData : ScriptableObject
 
     [Header("Equip")]
     public GameObject equipPrefab;
+
+    [Header("EquipBuff")]
+    public ItemEquipBuff[] equipBuffs;
+
+    private void OnEnable()
+    {
+        var all = (EquipType[])Enum.GetValues(typeof(EquipType));
+        equipTypeIndex = Array.IndexOf(all, equipType);
+    }
 }
