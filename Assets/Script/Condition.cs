@@ -29,6 +29,10 @@ public class Condition : MonoBehaviour
     {
         curValue = Mathf.Max(curValue - amount, 0.0f);
     }
+    public void SlowSubtract(float amount)
+    {
+        curValue = Mathf.Max(curValue - amount * Time.deltaTime, 0.0f);
+    }
 
     public float GetPercentage()
     {

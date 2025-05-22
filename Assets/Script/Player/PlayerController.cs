@@ -9,7 +9,8 @@ public class PlayerController : MonoBehaviour
     private Vector2 curMovementInput;
     public float jumpPower;
     public LayerMask groundLayerMask;
-    public float sprintSpeed;
+    public float sprintSpeed = 1.5f;       // 달릴 때 속도 배수
+    public float sprintStamina = 10f;   // 초당 소비량
     private bool isSprint=false;
 
     [Header("Look")]
@@ -73,7 +74,15 @@ public class PlayerController : MonoBehaviour
     {
         Move();
     }
-
+    private void Update()
+    {
+        if (isSprint && curMovementInput != Vector2.zero)
+        {
+            bool ok = CharacterManager.Instance.Player.condition.UseSprint(sprintStamina);
+            if (!ok)
+                isSprint = false;
+        }
+    }
     private void LateUpdate()
     {
         if (canLook)

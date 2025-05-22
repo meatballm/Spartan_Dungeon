@@ -56,4 +56,13 @@ public class PlayerCondition : MonoBehaviour, IDamagable
         stamina.Subtract(amount);
         return true;
     }
+    public bool UseSprint(float amount)
+    {
+        if (stamina.curValue <= amount/10)
+        {
+            return false;
+        }
+        stamina.SlowSubtract(amount);
+        return true;
+    }
 }
