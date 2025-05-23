@@ -23,3 +23,6 @@ MonoBehaviour:
   maxStackAmount: 0
   consumables: []
   equipPrefab: {fileID: 0}
+  equipBuffs:
+  - type: 1
+    value: 0

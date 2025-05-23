@@ -78,7 +78,7 @@ public class PlayerController : MonoBehaviour
     }
     private void Update()
     {
-        if (isSprint && curMovementInput != Vector2.zero)
+        if (isSprint && curMovementInput != Vector2.zero && IsGrounded())
         {
             bool ok = CharacterManager.Instance.Player.condition.UseSprint(sprintStamina);
             if (!ok)
@@ -112,15 +112,24 @@ public class PlayerController : MonoBehaviour
 
     public void OnJumpInput(InputAction.CallbackContext context)
     {
-        if (context.phase == InputActionPhase.Started)
+        if (context.phase != InputActionPhase.Started)
+            return;
+
+        if (IsGrounded())
         {
-            if(IsGrounded())
-            rigidbody.AddForce(Vector2.up * jumpPower, ForceMode.Impulse);
-            else if (canDoubleJump)
-            {
-                rigidbody.AddForce(Vector2.up * jumpPower, ForceMode.Impulse);
-                canDoubleJump = false;
-            }
+            rigidbody.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
+            canDoubleJump = doubleJump;
+        }
+        else if (canDoubleJump && doubleJump)
+        {
+            Vector3 inputDir = new Vector3(curMovementInput.x, 0f, curMovementInput.y);
+            if (inputDir.sqrMagnitude > 1f) inputDir.Normalize();
+            inputDir = transform.TransformDirection(inputDir) * moveSpeed;
+            float verticalVel = jumpPower / rigidbody.mass;
+            
+            rigidbody.velocity = new Vector3(inputDir.x, verticalVel, inputDir.z);
+            canDoubleJump = false;
+            //addforce로 시도해 보았지만, 점프대를 만들며 velocity를 수정하여 움직이는 것으로 결정
         }
     }
 
@@ -134,20 +143,36 @@ public class PlayerController : MonoBehaviour
 
     private void Move()
     {
-        Vector3 inputDir = new Vector3(curMovementInput.x, 0f, curMovementInput.y);
+        bool grounded = IsGrounded();
+        Vector3 inputDir = grounded
+         ? new Vector3(curMovementInput.x, 0f, curMovementInput.y)
+         : Vector3.zero;
+
         if (inputDir.sqrMagnitude > 1f) inputDir.Normalize();
-        Vector3 worldDir = transform.TransformDirection(inputDir);
-
+        Vector3 worldDir = transform.TransformDirection(inputDir).normalized;
         float speed = (curMovementInput != Vector2.zero && isSprint)
-                    ? sprintSpeed* moveSpeed
+                    ? sprintSpeed * moveSpeed
                     : moveSpeed;
-        Vector3 targetVel = worldDir * speed;
+        Vector3 desiredVel = worldDir * speed;
 
-        Vector3 currentVel = rigidbody.velocity;
-        Vector3 deltaVel = targetVel - new Vector3(currentVel.x, 0f, currentVel.z);
-
-        rigidbody.AddForce(deltaVel, ForceMode.VelocityChange);
+        if (grounded)
+        {
+            Vector3 v = rigidbody.velocity;
+            rigidbody.velocity = new Vector3(desiredVel.x, v.y, desiredVel.z);
+        }
+        else
+        {
+            // 공중 관성 유지
+            Vector3 current = rigidbody.velocity;
+            Vector3 horizontal = new Vector3(current.x, 0f, current.z);
+            float along = Vector3.Dot(horizontal, worldDir);
+            Vector3 projected = worldDir * along;
+            Vector3 delta = desiredVel - projected;
+            rigidbody.AddForce(delta, ForceMode.VelocityChange);
+        }
     }
+
+
 
     void CameraLook()
     {
