@@ -4974,6 +4974,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: eced84f3-f7f1-4d38-9f33-52059b4e05a0
     m_ActionName: Player/Sprint[/Keyboard/shift]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1293718473}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: On3rdPersonInput
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 80c51885-fd96-44d4-88e9-9601d9de6be4
+    m_ActionName: Player/3rdPerson[/Keyboard/f5]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player

@@ -141,6 +141,14 @@ public class PlayerController : MonoBehaviour
             isSprint = false;
     }
 
+    public void On3rdPersonInput(InputAction.CallbackContext context)
+    {
+        if (camDistance == 0f)
+            camDistance = 5f;
+        else
+            camDistance = 0f;
+    }
+
     private void Move()
     {
         bool grounded = IsGrounded();
