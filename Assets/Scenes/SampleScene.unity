@@ -2963,7 +2963,7 @@ MonoBehaviour:
   curValue: 0
   maxValue: 500
   startValue: 400
-  passiveValue: -20
+  passiveValue: -5
   uiBar: {fileID: 1517071113}
 --- !u!1001 &712310002
 PrefabInstance:
@@ -5009,6 +5009,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   uiCondition: {fileID: 122223037}
   noHungerHealthDecay: 2
+  noHungerStaminaDecay: 15
 --- !u!114 &1293718477
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -13,6 +13,7 @@ public class PlayerCondition : MonoBehaviour, IDamagable
     Condition stamina { get { return uiCondition.stamina; } }
 
     public float noHungerHealthDecay;
+    public float noHungerStaminaDecay;
     public event Action onTakeDamage;
 
     private void Update()
@@ -20,6 +21,7 @@ public class PlayerCondition : MonoBehaviour, IDamagable
         if (hunger.curValue <= 0f)
         {
             health.Subtract(noHungerHealthDecay * Time.deltaTime);
+            stamina.Subtract(noHungerStaminaDecay * Time.deltaTime);
         }
 
         if (health.curValue <= 0f)
